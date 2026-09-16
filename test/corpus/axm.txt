@@ -1,0 +1,261 @@
+==================
+imports
+==================
+
+import { User, Email as ContactEmail } from "./users";
+import { Address } from "./geo"
+
+---
+
+(source_file
+  (import_stmt
+    (imported_name
+      name: (identifier))
+    (imported_name
+      name: (identifier)
+      alias: (identifier))
+    source: (string))
+  (import_stmt
+    (imported_name
+      name: (identifier))
+    source: (string)))
+
+==========================
+type aliases with rules
+==========================
+
+type Email = String.email().max_length(320);
+type NonEmpty = String.nonempty().trim()
+type Age = Int.min(0).max(130, "too old")
+
+---
+
+(source_file
+  (type_decl
+    name: (identifier)
+    (annotated_type
+      (type_ref
+        (identifier))
+      (call
+        method: (identifier))
+      (call
+        method: (identifier)
+        (literal
+          (number)))))
+  (type_decl
+    name: (identifier)
+    (annotated_type
+      (type_ref
+        (identifier))
+      (call
+        method: (identifier))
+      (call
+        method: (identifier))))
+  (type_decl
+    name: (identifier)
+    (annotated_type
+      (type_ref
+        (identifier))
+      (call
+        method: (identifier)
+        (literal
+          (number)))
+      (call
+        method: (identifier)
+        (literal
+          (number))
+        (literal
+          (string))))))
+
+==================
+bare model
+==================
+
+model User {
+  id: UUID,
+  email: String? = "anon"
+}
+
+---
+
+(source_file
+  (model_decl
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier)))
+      (literal
+        (string)))))
+
+========================
+model with source and rules
+========================
+
+model User extends select<public.users> {
+  id: UUID,
+  "two words"? : String.email(),
+  age: Int.min(0) = 21,
+}
+
+---
+
+(source_file
+  (model_decl
+    name: (identifier)
+    (model_source
+      (db_ident))
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))
+    (field_decl
+      name: (string)
+      (annotated_type
+        (type_ref
+          (identifier))
+        (call
+          method: (identifier))))
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))
+        (call
+          method: (identifier)
+          (literal
+            (number))))
+      (literal
+        (number)))))
+
+==================
+queries
+==================
+
+query GetUser($id: UUID) -> User? {
+    SELECT id, email
+    FROM users
+    WHERE id = $id;
+}
+
+query DeleteUser($id: UUID) {
+    DELETE FROM users
+    WHERE id = $id;
+}
+
+query ListUsers($limit: Int) -> User[] {
+    SELECT *
+    FROM users
+    ORDER BY id
+    LIMIT $limit;
+}
+
+---
+
+(source_file
+  (query_decl
+    name: (identifier)
+    (param_decl
+      name: (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))
+    (sql_body))
+  (query_decl
+    name: (identifier)
+    (param_decl
+      name: (identifier)
+      (type_ref
+        (identifier)))
+    (sql_body))
+  (query_decl
+    name: (identifier)
+    (param_decl
+      name: (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))
+    (sql_body)))
+
+===
+query body strings and comments
+===
+
+query Q() {
+    SELECT name 'a''b' -- a } brace
+    FROM users /* block }
+    with } brace */
+    WHERE x = "}" AND y = $1;
+}
+
+---
+
+(source_file
+  (query_decl
+    name: (identifier)
+    (sql_body)))
+
+==================
+dollar-quoted bodies
+==================
+
+query Q() {
+    $$ not a { brace $$
+    AND
+    $tag$ still not a } brace $tag$
+    AND x = $2;
+}
+
+---
+
+(source_file
+  (query_decl
+    name: (identifier)
+    (sql_body)))
+
+============================
+no separators between items
+============================
+
+type A = Int
+model M { b: Boolean? }
+query X($n: Int) -> Int { SELECT $n }
+import { A } from "x";
+
+---
+
+(source_file
+  (type_decl
+    name: (identifier)
+    (annotated_type
+      (type_ref
+        (identifier))))
+  (model_decl
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier)))))
+  (query_decl
+    name: (identifier)
+    (param_decl
+      name: (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))
+    (sql_body))
+  (import_stmt
+    (imported_name
+      name: (identifier))
+    source: (string)))
