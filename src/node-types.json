@@ -45,6 +45,32 @@
     }
   },
   {
+    "type": "decorator",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "field_decl",
     "named": true,
     "fields": {
@@ -169,6 +195,10 @@
       "required": false,
       "types": [
         {
+          "type": "decorator",
+          "named": true
+        },
+        {
           "type": "field_decl",
           "named": true
         },
@@ -239,6 +269,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "decorator",
+          "named": true
+        },
         {
           "type": "param_decl",
           "named": true
@@ -369,6 +403,10 @@
   },
   {
     "type": "?",
+    "named": false
+  },
+  {
+    "type": "@",
     "named": false
   },
   {

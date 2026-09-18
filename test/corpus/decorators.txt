@@ -1,0 +1,142 @@
+=======================
+decorators on models
+=======================
+@safeParse("first")
+model User {
+  email: String .email()
+}
+
+---
+
+(source_file
+  (model_decl
+    (decorator
+      name: (identifier)
+      (literal
+        (string)))
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))
+        (call
+          method: (identifier))))))
+
+=========================
+parse decorator on model
+=========================
+@parse
+model Post {
+  title: String
+}
+
+---
+
+(source_file
+  (model_decl
+    (decorator
+      name: (identifier))
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))))
+
+==========================
+no_codegen decorator on model
+==========================
+@no_codegen
+model Secret {
+  id: UUID
+}
+
+---
+
+(source_file
+  (model_decl
+    (decorator
+      name: (identifier))
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))))
+
+============================
+target decorator with args
+============================
+@target("typescript", "rust")
+model Shared {
+  id: UUID
+}
+
+---
+
+(source_file
+  (model_decl
+    (decorator
+      name: (identifier)
+      (literal
+        (string))
+      (literal
+        (string)))
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))))
+
+==============================
+stacked decorators on model
+==============================
+@no_codegen
+@safeParse("all")
+model Internal {
+  id: UUID
+}
+
+---
+
+(source_file
+  (model_decl
+    (decorator
+      name: (identifier))
+    (decorator
+      name: (identifier)
+      (literal
+        (string)))
+    name: (identifier)
+    (field_decl
+      name: (identifier)
+      (annotated_type
+        (type_ref
+          (identifier))))))
+
+==========================
+decorator on query
+==========================
+@target("typescript")
+query GetUser($id: UUID) -> User {
+  SELECT 1;
+}
+
+---
+
+(source_file
+  (query_decl
+    (decorator
+      name: (identifier)
+      (literal
+        (string)))
+    name: (identifier)
+    (param_decl
+      name: (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))
+    (sql_body)))

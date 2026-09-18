@@ -59,6 +59,20 @@ module.exports = grammar({
     imported_name: ($) =>
       seq(field('name', $.identifier), optional(seq('as', field('alias', $.identifier)))),
 
+    // @safeParse("first"), @parse, @target("typescript", "rust")
+    decorator: ($) =>
+      seq(
+        '@',
+        field('name', $.identifier),
+        optional(
+          seq(
+            '(',
+            repeat(seq($.literal, optional(','))),
+            ')',
+          ),
+        ),
+      ),
+
     // type Email = String.min_length(3, "...").lowercase();
     type_decl: ($) =>
       seq('type', field('name', $.identifier), '=', $.annotated_type, optional(';')),
@@ -66,6 +80,7 @@ module.exports = grammar({
     // model User extends select<public.users> { id: UUID, email: Email?; }
     model_decl: ($) =>
       seq(
+        repeat($.decorator),
         'model',
         field('name', $.identifier),
         optional($.model_source),
@@ -90,6 +105,7 @@ module.exports = grammar({
     // query findUser($id: UUID, name: String?) -> [User] { SELECT * FROM users };
     query_decl: ($) =>
       seq(
+        repeat($.decorator),
         'query',
         field('name', $.identifier),
         '(',
